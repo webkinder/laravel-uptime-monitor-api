@@ -3,6 +3,7 @@
 namespace LKDevelopment\UptimeMonitorAPI\Http\Controller;
 
 use Spatie\Url\Url;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Spatie\UptimeMonitor\Models\Monitor;
@@ -31,6 +32,7 @@ class MonitorController extends Controller
      */
     public function store(Request $request)
     {
+        $status = 200;
         $this->validate($request, config('laravel-uptime-monitor-api.validationRules'));
         $url = Url::fromString($request->get('url'));
         try{ 
@@ -42,10 +44,17 @@ class MonitorController extends Controller
             'uptime_check_interval_in_minutes' => $request->get('uptime_check_interval_in_minutes'),
             'uptime_check_failure_reason' => ''
             ]);
-       } catch (CannotSaveMonitor $exception){
-            return response()->json(['created' => false, 'error' => $exception->getMessage()]);
+       } catch (Exception $exception){
+            // set status to "conflict" - because we can't create an existing monitor again
+            if(get_class($exception) === "Spatie\UptimeMonitor\Exceptions\CannotSaveMonitor"){
+                $status = 409;
+            } else {
+                // set status to bad request because we are unsure why the request failed
+                $status = 400;
+            }
+            return response()->json(['created' => false, 'error' => $exception->getMessage()], $status );
         }
-        return response()->json(['created' => true]);
+        return response()->json(['created' => true], $status);
     }
 
     /**
