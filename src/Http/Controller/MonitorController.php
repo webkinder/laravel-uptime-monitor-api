@@ -10,6 +10,8 @@ use Spatie\UptimeMonitor\Models\Monitor;
 use Spatie\UptimeMonitor\Exceptions\CannotSaveMonitor;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
+use LKDevelopment\UptimeMonitorAPI\Http\Resources\MonitorResource;
+
 class MonitorController extends Controller
 {
     use ValidatesRequests;
@@ -65,7 +67,7 @@ class MonitorController extends Controller
      */
     public function show($id)
     {
-        return Monitor::findOrFail($id);
+        return new MonitorResource(Monitor::findOrFail($id));
     }
 
     /**
