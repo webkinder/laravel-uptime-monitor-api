@@ -1,5 +1,5 @@
 {
-    "name": "lkdev/laravel-uptime-monitor-api",
+    "name": "webkinder/laravel-uptime-monitor-api",
     "description": "A Restful API for spatie's uptime Monitor",
     "keywords": [
         "spatie",
