@@ -6,6 +6,7 @@ use Spatie\Url\Url;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Spatie\UptimeMonitor\Models\Monitor;
+use Spatie\UptimeMonitor\Exceptions\CannotSaveMonitor;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
 class MonitorController extends Controller
@@ -32,15 +33,18 @@ class MonitorController extends Controller
     {
         $this->validate($request, config('laravel-uptime-monitor-api.validationRules'));
         $url = Url::fromString($request->get('url'));
-        Monitor::create([
+        try{ 
+            Monitor::create([
             'url' => trim($url, '/'),
             'look_for_string' => $request->get('look_for_string') ?? '',
             'uptime_check_method' => $request->has('look_for_string') ? 'get' : 'head',
             'certificate_check_enabled' => $url->getScheme() === 'https',
             'uptime_check_interval_in_minutes' => $request->get('uptime_check_interval_in_minutes'),
             'uptime_check_failure_reason' => ''
-        ]);
-
+            ]);
+       } catch (CannotSaveMonitor $exception){
+            return response()->json(['created' => false, 'error' => $exception->getMessage()]);
+        }
         return response()->json(['created' => true]);
     }
 
