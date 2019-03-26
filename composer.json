@@ -17,7 +17,7 @@
     ],
     "require": {
         "php": "^7.0",
-        "spatie/laravel-uptime-monitor": "^2.0",
+        "spatie/laravel-uptime-monitor": "^3.0",
         "illuminate/support": "^5.4.11",
         "illuminate/database": "^5.4.11"
     },
